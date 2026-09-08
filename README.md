@@ -156,11 +156,44 @@ cp -r JobSearch/skills/job-search ~/.claude/skills/   # 其它客户端换成各
 
 👆 上图就是 job-search 自动导出的表格长这样，一个文件带走全部岗位。想亲手打开这份示例（示例数据，非真实在招岗位）：**📗 [sample-job-search-result.xlsx](examples/sample-job-search-result.xlsx)**
 
-## 🗺️ 地区支持
+## 🗺️ 地区与平台覆盖
 
-中国大陆 · 澳大利亚 · 新西兰 · 美国 / 加拿大 · 英国 · 欧洲 · 日本 · 韩国 · 新加坡 · 东南亚
+**目前支持**：🇨🇳 中国大陆 · 🇦🇺 澳大利亚 · 🇳🇿 新西兰 · 🇺🇸🇨🇦 美国 / 加拿大 · 🇬🇧 英国 · 🇪🇺 欧洲（德语区）· 🇯🇵 日本 · 🇰🇷 韩国 · 🇸🇬 新加坡 · 🌏 东南亚
 
-每个地区内置**本土平台 + 专属搜索语法 + 工签筛选关键词**（visa sponsorship / H-1B / skilled worker / 482 / ビザサポート / 비자 지원…），海外岗位 Excel 会单独标注签证列 ✅ / ❓ / ❌。
+每个地区都内置了**本土平台库 + 专属搜索语法 + 工签筛选关键词**。每个地区搜岗位时还会**默认带上全球通用平台**：LinkedIn、Indeed、Glassdoor、Google Jobs。
+
+> 两种覆盖方式：**🌐 免登录搜索**（WebSearch 索引平台公开页面，快但可能有快照过期，会做 30 天时效过滤）+ **🔐 登录态实时抓取**（浏览器 MCP / cookies 进你已登录的账号，拿到的是平台在线岗位，质量最高）。
+
+### 🇨🇳 中国大陆 —— 主流的都能覆盖到 👌
+
+| 渠道 | 覆盖平台 | 覆盖方式 |
+|---|---|---|
+| 🏢 头部综合招聘 | **Boss 直聘** · 猎聘 · 智联招聘 · 前程无忧(51job) | 🌐 免登录搜索 + 30 天时效过滤；🟢 高匹配岗重点验证 |
+| 🔥 需登录实时抓取 | **Boss 直聘**（重点） | 🔐 浏览器 MCP 登录态：关键词搜索 + **读取你保存的岗位分组**批量提取（一组 300–500 个在线岗位，AI 按简历筛选） |
+| 🏛️ 大厂官方社招 | 各公司**招聘官网** /「加入我们」/「社会招聘」页 | 🌐 覆盖字节、腾讯、阿里、百度等官方招聘 |
+| 💬 微信公众号招聘 | 大厂招聘公众号推文（`mp.weixin.qq.com`、搜狗微信） | 🌐 很多岗位只发公众号 |
+| 🤝 内推 / 垂直社区 | **牛客网**（内推帖）· V2EX · 掘金 | 🌐 内推渠道、隐藏岗位 |
+| 🧳 外资 / 出海 | LinkedIn 中国职场 · 外企官网 | 🌐 外企岗、英文 JD |
+
+> 国内大小厂、创业公司、外企、内推、公众号隐藏岗，基本都能搜到。Boss 直聘再叠加你的登录态分组，能拿到别处搜不到的在线岗位池。
+
+### 🌏 海外分地区
+
+| 地区 | 本土主平台 | 额外说明 | 工签筛选关键词 |
+|---|---|---|---|
+| 🇦🇺 澳大利亚 | Seek AU · Indeed AU · Jora · Facebook Jobs | Seek 是澳洲最大求职站 | `visa sponsorship` / `482` |
+| 🇳🇿 新西兰 | Seek NZ · Trade Me Jobs · Indeed NZ | 与澳洲 Seek 相互独立 | `visa sponsorship` |
+| 🇺🇸🇨🇦 美国 / 加拿大 | ZipRecruiter · Monster · **Dice**(科技) · **USAJobs**(政府) · Wellfound(创业) | 科技岗优先走 Dice | `h1b` / `visa sponsorship` / `work authorization` |
+| 🇬🇧 英国 | Reed · Totaljobs · CV-Library · Indeed UK | — | `skilled worker visa` / `sponsorship licence` |
+| 🇪🇺 欧洲（德语区） | StepStone · XING · LinkedIn | 科技岗多英文 JD，中英双语都搜 | `visa sponsorship` |
+| 🇯🇵 日本 | **Daijob**(外国人向) · **GaijinPot**(外国人向) · Rikunabi | 英 + 日 + 中三轮都搜 | `visa support` / `ビザサポート` |
+| 🇰🇷 韩国 | Saramin · JobKorea · **WorkNet**(政府) · People'n Job(外国人向) | 对海外/外国人友好岗 | `비자 지원` / `외국인 가능` |
+| 🇸🇬 新加坡 | **MyCareersFuture**(政府) · JobStreet SG | 政府平台岗位可靠 | `EP` / `visa sponsorship` |
+| 🌏 东南亚 | JobStreet · JobsDB(港澳及东南亚) | — | `visa sponsorship` |
+
+**签证列**：海外岗位 Excel 会自动标注 ✅ 提供担保 / ❓ 未标注 / ❌ 仅限本地身份，帮你一眼筛掉办不了工签的。
+
+> 表里没列的渠道（比如脉脉、小红书、领英内推群…）只要告诉 AI 平台名或域名，它会用 `site:` 语法临时加一轮搜索，不用改技能本身。
 
 ## 🛡️ 安全红线（内置）
 
