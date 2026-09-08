@@ -56,6 +56,10 @@
 ```
 JobSearch/
 ├── README.md
+├── assets/
+│   └── job-search-excel-preview.svg     # 🎬 导出 Excel 的效果示意图
+├── examples/
+│   └── sample-job-search-result.xlsx    # 📗 可直接打开的示例结果表
 └── skills/
     └── job-search/                  # 核心技能（复制到你的 skills 目录即可）
         ├── SKILL.md                 # 主逻辑：信息收集 · 搜索执行 · 质检 · 输出
@@ -80,6 +84,26 @@ cp -r JobSearch/skills/job-search ~/.claude/skills/
 
 重启会话后即可使用。其它支持 Agent Skills 的 AI（Codex、Cursor 等）复制到对应 skills 目录即可，skill 内部已按环境能力自动降级适配。
 
+### ⚡ 一键安装：不用敲命令，直接对你的 AI 说（复制即用）
+
+> **WorkBuddy / Claude Code / Codex / 豆包** 等都能用 👇
+
+```text
+帮我安装 Job Search 这个求职技能：https://github.com/Sean-9/JobSearch
+装好后参考我桌面上的简历（简历.pdf），在【深圳】找一批【AI 产品经理】的岗位，
+期望 30-50K，最好双休。
+```
+
+装好后 AI 会先跟你确认岗位方向 / Base 城市 / 期望薪资 / 硬性要求，再开搜、质检、按匹配度列出岗位，最后询问是否导出 Excel（见下方「使用效果」）。
+
+- **WorkBuddy / 豆包 / 通用助手**：把上面这句直接粘进对话即可，它们会自动 clone 仓库、把 `skills/job-search` 装进技能库再开始搜；
+- **Claude Code / Codex / Cursor**：直接粘贴即可；如果它没自动装，改让它执行下面两条命令：
+
+```bash
+git clone https://github.com/Sean-9/JobSearch
+cp -r JobSearch/skills/job-search ~/.claude/skills/   # 其它客户端换成各自的 skills 目录路径
+```
+
 ## 🧭 怎么触发
 
 **斜杠命令**
@@ -91,6 +115,46 @@ cp -r JobSearch/skills/job-search ~/.claude/skills/
 > 帮我找工作 / 有什么合适的岗位 / 帮我搜一下岗位 / 哪些公司在招 / 看看有什么机会 / job search
 
 从其它 skill 衔接过来表示想找工作或投递，也会自动触发。
+
+## 🎬 使用效果：说一句话之后会发生什么
+
+把「一键安装」里那句发给 AI 后，大致是这样的流程 👇
+
+**① 简历里能提取的直接用，只问缺失的信息**（支持 AskUserQuestion 弹选择框）
+
+> 🤖 AI：📄 已读到你的简历 —— 产品岗 4 年，近 2 年做 AI 应用（智能体 / RAG / Prompt），英语可作工作语言。搜索前先确认几点：
+> - 🎯 **岗位方向**：按简历主推「AI 产品经理」，要加「AI 应用 PM / Prompt Engineer」吗？
+> - 📍 **Base 城市**：想搜哪？支持多选
+> - 💰 **期望薪资**：大概范围是？
+> - 🧱 **硬性要求**：双休 / 大厂 / 创业 / 远程 / 签证 之类
+>
+> 😀 你：就按主推来。城市深圳 + 广州，薪资 30-50K，只看双休、大厂或明星创业。
+
+**② AI 开搜 → 独立质检 → 分级输出**
+
+> 🔎 15 组关键词 × 6 平台并行 → 过滤 30 天前快照 → 质检去重 → **命中 63 个岗位（🟢 12 / 🟡 29 / 🟠 22）**
+
+**③ 结果列表节选** —— 🟢 每条都附 2-3 个匹配点：
+
+> 📋 为你找到 63 个匹配岗位
+>
+> 🟢 **AI 产品经理（Agent 方向）** · 字节跳动·火山引擎
+> 📍 深圳 · 💰 40-60K · 📅 2天前发布 · 🏷️ 大厂 · 双休 · 急招
+> 匹配点：智能体工作流、LLM 应用、0→1 产品
+> 🔗 https://www.zhipin.com/job_detail/...
+>
+> 🟢 **大模型产品经理** · 腾讯 · 📍 深圳 · 💰 40-60K · …（共 12 条 🟢）
+>
+> 说「继续」展开 🟡 / 🟠 批次，或回复编号看单个岗位的完整匹配分析。
+
+**④ 一键导出 Excel —— 投递清单直接拿走**
+
+> 😀 你：都导出成 Excel
+> 🤖 AI：📗 已生成 —— 14 列 · 按 🟢/🟡/🟠 上色 · 冻结首行 · 自动筛选
+
+![Job Search Excel 导出示例](assets/job-search-excel-preview.svg)
+
+👆 上图就是 job-search 自动导出的表格长这样，一个文件带走全部岗位。想亲手打开这份示例（示例数据，非真实在招岗位）：**📗 [sample-job-search-result.xlsx](examples/sample-job-search-result.xlsx)**
 
 ## 🗺️ 地区支持
 
