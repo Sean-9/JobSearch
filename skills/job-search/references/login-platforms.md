@@ -23,6 +23,43 @@
 
 合规边界：方式 A/B 都是用户访问自己有权查看的账号数据，不涉及破解平台反爬机制（伪装机器人、破解验证码等一律不做）。
 
+### 先帮用户装上浏览器控制能力（Claude Code）
+
+探测到没有浏览器控制 MCP 时，**不要默默降级**到 cookies——先尝试自动安装官方 Chrome DevTools MCP（Chrome 团队出品，底层即 CDP）：
+
+```bash
+claude mcp add --scope user chrome-devtools -- npx -y chrome-devtools-mcp@latest
+claude mcp list    # 应显示 chrome-devtools: ✓ Connected
+```
+
+**关键：MCP 在会话启动时加载，运行中添加的必须重启会话才注入工具**。装完引导用户重启，重启后才回到方式 A；用户不装/装不了，再降级方式 B（cookies）或方式 C。Codex / Cursor 等其它客户端按其自身方式配置 Chrome DevTools MCP / Playwright MCP 即可（底层都是 CDP，操作逻辑同方式 A）。
+
+### 无 MCP 时的等价接管：本地 Chrome + CDP
+
+装不了 MCP、但本机有 Chrome 和 Python Playwright 时，可用**本地 CDP** 复刻方式 A（适合「用户自己扫码登录、AI 来操作」，与 chrome-devtools-mcp 同一条通道）：
+
+```bash
+chrome.exe --remote-debugging-port=9222 \
+  --user-data-dir="C:\Users\<你的用户名>\.zhipin_sess" \
+  --no-first-run --disable-blink-features=AutomationControlled \
+  https://www.zhipin.com/
+```
+
+```python
+from playwright.async_api import async_playwright
+browser = (await async_playwright().start()).chromium.connect_over_cdp("http://127.0.0.1:9222")
+page = next(p for c in browser.contexts for p in c.pages if 'zhipin' in p.url)
+```
+
+之后所有导航/滚动/提取都在**同一个已登录 Chrome** 里进行。用户资料目录独立持久化，登录态可跨刷新保留，无需重复登录。
+
+### 需登录平台实操避坑（Boss 直聘实测）
+
+- **复合词精确匹配陷阱**：直接搜「金融产品经理」会漏掉大量标题不含该组合词的岗位，并混入「金融销售/客户经理」。应主搜「产品经理」（岗位大类），再用行业/方向词（金融/支付/信贷/风控/基金/数字银行/AI…）在标题与描述里二次命中。
+- **城市切换**：Boss 会记住账号上次所在城市（很可能不是目标城市），不切对城市搜到的全是老城市岗位。切法：点页面左上当前城市标签（`.city-label.active` / `.cur-city-label`）→ 弹层选省份再选城市；成功后 URL 出现城市 code（如杭州 `city=101210100`）。
+- **安全校验重定向**：带 URL 参数直接访问有时会被重定向到 `_security_check=...` 并丢弃 query/city。先完成一次校验并确认已登录，再带参数访问或改在页面上用搜索框操作。
+- **懒加载 / 选择器过时**：岗位列表懒加载需反复滚动到底；Boss 改版频繁，`.job-card-wrapper` 等选择器失效时改用卡片整段 `textContent` 交给 AI 解析。
+
 ## 方式 A：浏览器控制 MCP 辅助（推荐）
 
 如果当前环境有浏览器控制工具：
